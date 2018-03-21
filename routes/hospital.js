@@ -152,5 +152,9 @@ app.delete('/:id', mdAutenticacion.verficaToken, (req, res) => {
 
     });
 });
+//==================================================
+// otra seccion
+//==================================================
+
 
 module.exports = app;
