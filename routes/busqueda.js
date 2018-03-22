@@ -6,6 +6,48 @@ var Hospital = require('../models/hospital');
 var Medico = require('../models/medico');
 var Usuarios = require('../models/usuario');
 
+
+//==================================================
+// Busqueda por coleccion
+//==================================================
+app.get('/coleccion/:tabla/:busqueda', (req, res) => {
+
+    var tabla = req.params.tabla;
+    var busqueda = req.params.busqueda;
+    var regex = new RegExp(busqueda, 'i');
+
+    var promesa;
+    switch (tabla) {
+        case 'usuarios':
+            promesa = buscarUsuarios(busqueda, regex);
+            break;
+        case 'hospitales':
+            promesa = buscarHospitales(busqueda, regex);
+            break;
+        case 'medicos':
+            promesa = buscarMedicos(busqueda, regex);
+            break;
+        default:
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Los tipos de busqueda solo son usuarios, medicos y hospitales',
+                error: { message: 'Tipo de tabla/coleccion no valido' }
+            });
+            break;
+
+    }
+
+    promesa.then(data => {
+        res.status(200).json({
+            ok: true,
+            [tabla]: data
+        });
+    });
+
+
+});
+
+
 //==================================================
 //  Busqueda general
 //==================================================
@@ -93,35 +135,6 @@ function buscarUsuarios(busqueda, regex) {
 
 }
 
-//==================================================
-// Busqueda por coleccion
-//==================================================
-app.get('/coleccion/:tabla/:busqueda', (req, res) => {
-
-    var tabla = req.params.tabla;
-    var regexta = new RegExp(tabla, 'i');
-    var busqueda = req.params.busqueda;
-    var regex = new RegExp(busqueda, 'i');
-
-    if (regexta == 'medico') {
-        Medico.find({ nombre: regex })
-            .populate('usuario', 'nombre email')
-            .populate('hospital')
-            .exec((err, medicos) => {
-                res.status(200).json({
-                    ok: true,
-                    medicos: medicos
-                });
-            });
-    }
-    if (regexta == 'usuario') {
-
-    }
-    if (regexta == 'hospital') {
-
-    }
-
-});
 
 
 module.exports = app;
